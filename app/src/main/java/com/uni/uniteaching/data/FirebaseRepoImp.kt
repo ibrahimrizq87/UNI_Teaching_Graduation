@@ -8,6 +8,7 @@ import com.uni.uniteaching.data.di.FireStoreTable
 import com.uni.uniteaching.data.di.PermissionsRequired
 import com.uni.uniteaching.data.di.PostType
 import com.uni.uniteaching.classes.*
+import com.uni.uniteaching.classes.courses.Courses
 import javax.inject.Inject
 
 class FirebaseRepoImp@Inject constructor(

@@ -9,13 +9,20 @@ object FireStoreTable {
     val professor="professor"
     val assistant="assistan"
     val attendance="attendance"
+    val user="_teaching_users"
 }
 
 object SharedPreferencesTable{
     val local_shared_preferences="local_shared_preferences"
     val user_session="user_session"
-    val userType="user_type"
 
+
+
+}
+object UserTypes{
+
+    val assistantUser="assistant_user"
+    val professorUser="professor_user"
 }
 object PermissionsRequired{
     val sing_in_permission="sign_in_permission"
@@ -33,12 +40,6 @@ object departement{
     val IT= "IT"
     val BIO= "BIO"
     val SOFT= "SOFT"
-    val GROUP1= "GROUP1"
-    val GROUP2= "GROUP2"
-    val GROUP3= "GROUP3"
-    val GROUP4= "GROUP4"
-    val GROUP5= "GROUP5"
-
 }
 
 object PostType{

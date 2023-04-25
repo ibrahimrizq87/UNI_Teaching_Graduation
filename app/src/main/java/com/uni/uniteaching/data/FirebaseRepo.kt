@@ -1,6 +1,7 @@
 package com.uni.uniteaching.data
 
 import com.uni.uniteaching.classes.*
+import com.uni.uniteaching.classes.courses.Courses
 
 
 interface FirebaseRepo {

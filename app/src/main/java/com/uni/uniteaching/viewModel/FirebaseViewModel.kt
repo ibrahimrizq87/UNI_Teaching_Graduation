@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.uni.uniteaching.data.FirebaseRepo
 import com.uni.uniteaching.data.Resource
 import com.uni.uniteaching.classes.*
+import com.uni.uniteaching.classes.courses.Courses
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

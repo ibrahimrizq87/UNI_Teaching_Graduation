@@ -1,3 +1,17 @@
 <resources>
     <string name="app_name">UNI Teaching</string>
+    <string-array name="departement">
+        <item>CS</item>
+        <item>IS</item>
+        <item>IT</item>
+        <item>BIO</item>
+        <item>SOFT</item>
+
+    </string-array>
+    <string-array name="user_type">
+        <item>assistant</item>
+        <item>professor</item>
+
+    </string-array>
+
 </resources>
