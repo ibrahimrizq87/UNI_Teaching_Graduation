@@ -23,7 +23,7 @@ class AuthRepositoryImpl@Inject constructor(
 ) : AuthRepository {
 
     override suspend fun updateUserInfo(userStudent: UserTeaching, result: (Resource<String>) ->Unit ) {
-            val document=database.collection(userStudent.department+FireStoreTable.user)
+            val document=database.collection(FireStoreTable.user)
                 .document(userStudent.userId)
 
             document.set(userStudent)
@@ -39,7 +39,6 @@ class AuthRepositoryImpl@Inject constructor(
                         )
                     )
                 }
-
     }
 
     override val user:FirebaseUser?
@@ -104,7 +103,7 @@ class AuthRepositoryImpl@Inject constructor(
 
 
     override fun storeSession(id :String, user : UserTeaching, result :(UserTeaching?)-> Unit){
-       val document =database.collection(user.department+FireStoreTable.user)
+       val document =database.collection(FireStoreTable.user)
            .document(user.userId)
         document
             .get()
@@ -159,8 +158,8 @@ class AuthRepositoryImpl@Inject constructor(
             result.invoke(userStudent)
         }
     }
-    override  suspend fun getUser(id :String,dep:String, result:(Resource<UserTeaching?>) -> Unit) {
-        val docRef =  database.collection(dep+FireStoreTable.user)
+    override  suspend fun getUser(id :String, result:(Resource<UserTeaching?>) -> Unit) {
+        val docRef =  database.collection(FireStoreTable.user)
             .document(id)
 
         docRef.addSnapshotListener { snapshot, e ->

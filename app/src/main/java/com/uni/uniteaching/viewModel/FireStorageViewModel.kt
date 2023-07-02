@@ -14,6 +14,7 @@ import javax.inject.Inject
 class FireStorageViewModel @Inject constructor(
     private val repository: FireStorageRepo
 ): ViewModel() {
+
     private val _getUri= MutableStateFlow<Resource<Uri>?>(null)
     val getUri=_getUri.asStateFlow()
 
@@ -26,6 +27,23 @@ class FireStorageViewModel @Inject constructor(
             _getUri.value=it
         }
     }
+    private val _addPostUri= MutableStateFlow<Resource<String>?>(null)
+    val addPostUri=_addPostUri.asStateFlow()
+    fun addPostUri(postID:String,uri:Uri)= viewModelScope.launch{
+        _addPostUri.value= Resource.Loading
+        repository.uploadPostImage(uri,postID) {
+            _addPostUri.value=it
+        }
+    }
+    private val _deletePostImage= MutableStateFlow<Resource<String>?>(null)
+    val deletePostImage=_deletePostImage.asStateFlow()
+    fun deletePostImage(postID:String)= viewModelScope.launch{
+        _deletePostImage.value= Resource.Loading
+        repository.deletePostImage(postID) {
+            _deletePostImage.value=it
+        }
+    }
+
     fun addUri(userId:String,uri:Uri)= viewModelScope.launch{
         _addUri.value= Resource.Loading
         repository.uploadImage(uri,userId) {

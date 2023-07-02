@@ -9,8 +9,6 @@ class FireStorageRepoImp@Inject constructor(
     private val mStorageRef: StorageReference
 ): FireStorageRepo {
     override suspend fun uploadImage( imageUri: Uri, userId:String, result: (Resource<String>) -> Unit){
-
-
         val uploadTask = mStorageRef.child("users/$userId.png").putFile(imageUri)
         uploadTask.addOnSuccessListener {
             result.invoke(
@@ -22,8 +20,30 @@ class FireStorageRepoImp@Inject constructor(
             )
         }
     }
-
-
+    override suspend fun uploadPostImage( imageUri: Uri, postId: String, result: (Resource<String>) -> Unit){
+        val uploadTask = mStorageRef.child("posts/$postId.png").putFile(imageUri)
+        uploadTask.addOnSuccessListener {
+            result.invoke(
+                Resource.Success("image uploaded")
+            )
+        }.addOnFailureListener{
+            result.invoke(
+                Resource.Failure(it.toString())
+            )
+        }
+    }
+    override suspend fun deletePostImage(  postId: String, result: (Resource<String>) -> Unit){
+        val uploadTask = mStorageRef.child("posts/$postId.png").delete()
+        uploadTask.addOnSuccessListener {
+            result.invoke(
+                Resource.Success("image deleted")
+            )
+        }.addOnFailureListener{
+            result.invoke(
+                Resource.Failure(it.toString())
+            )
+        }
+    }
     //here there is a big problem but easy to be fixed first the image is being downloaded
     // every time the app is running so we want to save it in the local storage and second is
     // that it is downloaded by the the url not the uri

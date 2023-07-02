@@ -7,7 +7,6 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.StorageReference
 import com.google.gson.Gson
-import com.uni.unistudent.data.*
 import com.uni.uniteaching.data.*
 import dagger.Module
 import dagger.Provides

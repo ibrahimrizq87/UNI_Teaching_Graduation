@@ -41,9 +41,9 @@ class AuthViewModel @Inject constructor(private val repository: AuthRepository):
           }
 
     }
-    fun getUserStudent(id :String,dep:String)= viewModelScope.launch{
+    fun getUserStudent(id :String)= viewModelScope.launch{
         _userStudent.value= Resource.Loading
-        repository.getUser(id,dep){
+        repository.getUser(id){
             _userStudent.value=it
         }
     }

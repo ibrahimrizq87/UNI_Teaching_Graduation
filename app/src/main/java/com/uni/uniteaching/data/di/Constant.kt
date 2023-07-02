@@ -5,6 +5,8 @@ object FireStoreTable {
     val comment="comment"
     val courses="courses"
     val lectures="lectures"
+    val assistant_sections="assistant_sections"
+
     val sections ="sections"
     val professor="professor"
     val assistant="assistan"
@@ -20,7 +22,6 @@ object SharedPreferencesTable{
 
 }
 object UserTypes{
-
     val assistantUser="assistant_user"
     val professorUser="professor_user"
 }
@@ -42,13 +43,14 @@ object departement{
     val SOFT= "SOFT"
 }
 
+
+
 object PostType{
     val personal_posts= "personal_posts"
     val section_posts= "section_posts"
     val course= "course"
     val general= "general"
 }
-
 object Section{
     val S1= "S1"
     val S2= "S2"
@@ -62,4 +64,9 @@ object Section{
 object RealTime{
     val hall="hall"
     val lab="lab"
+}
+object SignUpKey{
+    const val MAIN_DATA="main_data"
+    const val BACK_DATA="back_data"
+    const val FROM_HOME_SCREEN="message_from_home"
 }

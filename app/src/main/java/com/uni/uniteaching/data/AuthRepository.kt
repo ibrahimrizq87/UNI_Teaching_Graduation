@@ -13,7 +13,7 @@ interface AuthRepository {
     suspend fun register(email:String, password:String, userStudent: UserTeaching, result:(Resource<String>) -> Unit)
     suspend fun logOut(result:()->Unit)
     fun storeSession(id :String, user : UserTeaching, result :(UserTeaching?)-> Unit)
-    suspend fun getUser(id :String,dep:String, result:(Resource<UserTeaching?>) -> Unit)
+    suspend fun getUser(id :String, result:(Resource<UserTeaching?>) -> Unit)
     fun getSessionStudent(result :(UserTeaching?)-> Unit)
     fun setSession(user: UserTeaching)
 

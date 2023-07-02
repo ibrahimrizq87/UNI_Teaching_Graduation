@@ -5,12 +5,16 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.View
+import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -18,6 +22,7 @@ import com.uni.uniteaching.R
 import com.uni.uniteaching.classes.user.UserTeaching
 import com.uni.uniteaching.data.Resource
 import com.uni.uniteaching.data.di.PermissionsRequired
+import com.uni.uniteaching.data.di.SignUpKey
 import com.uni.uniteaching.data.di.UserTypes
 import com.uni.uniteaching.data.di.departement
 import com.uni.uniteaching.databinding.ActivitySignUpBinding
@@ -30,217 +35,196 @@ import kotlinx.coroutines.flow.collectLatest
 import java.security.Permission
 
 @AndroidEntryPoint
-class SignUp : AppCompatActivity() {
-    private val viewModel : AuthViewModel by viewModels()
-    private val fireStorageViewModel : FireStorageViewModel by viewModels()
-    private val firebaseViewModel : FirebaseViewModel by viewModels()
-
-
-    private lateinit var auth: FirebaseAuth
-    private lateinit var database: DatabaseReference
-    private lateinit var deprtment: String
-    private lateinit var userType: String
-    val TAG="SignUp"
+class SignUp : AppCompatActivity(), FragmentSignUpSubData.CollectDataListener {
     private lateinit var binding: ActivitySignUpBinding
+    private val viewModel: AuthViewModel by viewModels()
+    private val fireStorageViewModel: FireStorageViewModel by viewModels()
+    private lateinit var auth: FirebaseAuth
+    val TAG = "SignUp"
+    private lateinit var progressPar: ProgressBar
+
     private lateinit var userImageUri: Uri
-    private lateinit var imageView: ImageView
-    private lateinit var progress: ProgressBar
-    companion object{
-        val IMAGE_REQUEST_CODE =100
+
+
+    companion object {
+        const val IMAGE_REQUEST_CODE = 100
     }
+
+
+    public fun nextFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction().apply {
+
+            setCustomAnimations(
+                R.anim.enter_right_to_left,
+                R.anim.exist_right_to_left,
+                R.anim.enter_left_to_right,
+                R.anim.exist_left_to_right
+            )
+
+            replace(
+                R.id.fragment_container,
+                fragment
+            ).commit()
+        }
+    }
+
+    public fun previousFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction().apply {
+
+            setCustomAnimations(
+                R.anim.enter_left_to_right,
+                R.anim.exist_left_to_right,
+                R.anim.enter_right_to_left,
+                R.anim.exist_right_to_left
+            )
+
+            replace(
+                R.id.fragment_container,
+                fragment
+            ).commit()
+        }
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = ActivitySignUpBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        nextFragment(FragmentSignUpMainData())
 
-        deprtment=""
-        userType=""
+        val message = intent.getStringExtra(SignUpKey.FROM_HOME_SCREEN)
+        if (message != null) {
+            if (message.isNotEmpty()) {
+                val rootView = findViewById<View>(android.R.id.content)
+                showTopSnackBar(rootView, message)
+
+            }
+        }
+
         userImageUri = Uri.EMPTY
-        progress=binding.progressBarSignIn
-        database = Firebase.database.reference
+        //----------------
+        auth = Firebase.auth
+        //----------------
 
-        imageView = binding.signUserImage
-
-
-/*
-binding.signUpButton.setOnClickListener {
-    viewModel.register("testingDoctorAccount@gmail.com","123456",
-        UserTeaching(
-        "professor Name",
-        "",
-        "123456",
-        "123456",
-        "anything",
-         UserTypes.professorUser,
-            departement.CS,
-            arrayListOf()
-    ))
-}*/
-        val departmentList = resources.getStringArray(R.array.departement)
-        val adapter: ArrayAdapter<CharSequence> = ArrayAdapter.createFromResource(this,R.array.departement,R.layout.spinner_item)
-        val autoCom = findViewById<Spinner>(R.id.department_spinner)
-        autoCom.adapter = adapter
-
-        autoCom.onItemSelectedListener= object : AdapterView.OnItemSelectedListener{
-            override fun onItemSelected(p0 : AdapterView<*>?, p1: View?, p2:Int, p3: Long) {
-                deprtment =departmentList[p2]
-                binding.departmentText.text=deprtment
-            }
-            override fun onNothingSelected(p0: AdapterView<*>?) {}
-        }
-
-
-        val userTypeList = resources.getStringArray(R.array.user_type)
-        val adapter2: ArrayAdapter<CharSequence> = ArrayAdapter.createFromResource(this,R.array.departement,R.layout.spinner_item)
-        val autoCom2 = findViewById<Spinner>(R.id.department_spinner)
-        autoCom2.adapter = adapter2
-
-        autoCom2.onItemSelectedListener= object : AdapterView.OnItemSelectedListener{
-            override fun onItemSelected(p0 : AdapterView<*>?, p1: View?, p2:Int, p3: Long) {
-                userType =userTypeList[p2]
-                binding.userTypeText.text=userType
-            }
-            override fun onNothingSelected(p0: AdapterView<*>?) {}
-        }
-        binding.imageClick.setOnClickListener {
-            pickImageFromGallery()
-        }
-
-        binding.signUpBt.setOnClickListener {
-
-            val email=binding.signEmailAddress.text.toString()
-            val password = binding.signPassword.text.toString()
-            val code = binding.signCode.text.toString()
-            val fullName = binding.signName.text.toString()
-            val special = binding.signUpSpecial.text.toString()
-
-            if (userImageUri != Uri.EMPTY){
-                if (email.isNotEmpty()
-                    &&password.isNotEmpty()
-                    &&code.isNotEmpty()
-                    &&special.isNotEmpty()
-                    &&fullName.isNotEmpty()
-                    &&deprtment.isNotEmpty()
-                    &&userType.isNotEmpty()
-                ){
-                    if (password.length == 14){
-                        viewModel.register(
-                            email
-                            ,password
-                            , UserTeaching(
-                            fullName,
-                                "",
-                                code,
-                                password
-                                ,special
-                                ,userType
-                                ,deprtment
-
-                        )
-                        )
-                        observeUser()
-                    }else{
-                        Toast.makeText(this,"make sure to write the 14 number of the national id",
-                            Toast.LENGTH_SHORT).show()
-
-                    }
-                }else{
-                    Toast.makeText(this,"all data required", Toast.LENGTH_SHORT).show()
-
-                }
-            }else{
-                Toast.makeText(this,"make sure to choose pic", Toast.LENGTH_SHORT).show()
-
-            }
-        }
+        progressPar = binding.progressBarRegister
 
 
     }
 
+
+    // observing the registration function to check if it run properly
+    private fun observeSignUp() {
+        lifecycleScope.launchWhenCreated {
+            viewModel.register.collectLatest { state ->
+                when (state) {
+                    is Resource.Loading -> {
+                        progressPar.visibility = View.VISIBLE
+
+                    }
+
+                    is Resource.Success -> {
+
+                        Toast.makeText(this@SignUp, state.result, Toast.LENGTH_LONG).show()
+                        val userId = auth.currentUser?.uid
+                        if (userId != null) {
+                            fireStorageViewModel.addUri(userId, userImageUri)
+                            observeUploadedImage()
+                        }
+                        startActivity(Intent(this@SignUp, HomeScreen::class.java))
+                    }
+
+                    is Resource.Failure -> {
+                        progressPar.visibility = View.GONE
+                        Toast.makeText(
+                            this@SignUp, state.exception.toString(),
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+
+                    else -> {}
+                }
+            }
+
+        }
+    }
+
+
+    // observing the upload function to check if it run properly
     private fun observeUploadedImage() {
         lifecycleScope.launchWhenCreated {
             fireStorageViewModel.addUri.collectLatest {
                 when (it) {
                     is Resource.Loading -> {
+                        progressPar.visibility = View.VISIBLE
                     }
-                    is Resource.Success -> {
-                        Toast.makeText(this@SignUp,it.result,Toast.LENGTH_LONG).show()
 
+                    is Resource.Success -> {
+                        progressPar.visibility = View.GONE
+                        Log.e(TAG, "it.result ")
                     }
                     is Resource.Failure -> {
 
-                        Toast.makeText(this@SignUp,it.exception.toString(),Toast.LENGTH_LONG).show()
-                    }
-                    else->{}
-                }
-
-            }
-        }}
-
-    private fun pickImageFromGallery(){
-        val intent = Intent (Intent.ACTION_PICK)
-        intent.type = "image/*"
-        startActivityForResult(intent, IMAGE_REQUEST_CODE)
-
-    }
-
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == IMAGE_REQUEST_CODE && resultCode == RESULT_OK)
-        {
-            userImageUri = data?.data!!
-            imageView.setImageURI(userImageUri)
-        }
-    }
-
-
-private fun observeUser(){
-    lifecycleScope.launchWhenCreated {
-        viewModel.register.collectLatest { state ->
-            when (state) {
-                is Resource.Loading -> {
-                    progress.visibility=View.VISIBLE
-                    Log.e(TAG, "Loading")
-
-                }
-                is Resource.Success -> {
-                    progress.visibility=View.INVISIBLE
-                    Toast.makeText(this@SignUp,state.result, Toast.LENGTH_LONG).show()
-                    val userId = auth.currentUser?.uid
-                    if (userId !=null){
-                        fireStorageViewModel.addUri(userId,userImageUri)
-                        observeUploadedImage()
+                        Toast.makeText(this@SignUp, it.exception.toString(), Toast.LENGTH_LONG)
+                            .show()
                     }
 
-                    startActivity(Intent(this@SignUp, HomeScreen::class.java))
+                    else -> {}
                 }
-                is Resource.Failure -> {
-                    Log.e(TAG, state.exception.toString())
-                    progress.visibility=View.INVISIBLE
-                    Toast.makeText(this@SignUp,state.exception.toString(),
-                        Toast.LENGTH_LONG).show()
-                }
-                else->{}
+
             }
         }
 
     }
-}
+
+
+    override fun signUp(bundle: Bundle) {
+
+        userImageUri = Uri.parse(bundle.getString("userImageUri"))
+
+        viewModel.register(
+            bundle.getString("emailAddress").toString(),
+            bundle.getString("password").toString(),
+            UserTeaching(
+                bundle.getString("name").toString(),
+                "",
+                bundle.getString("code").toString(),
+                bundle.getString("nationalID").toString(),
+                bundle.getString("specialization").toString(),
+                bundle.getString("userType").toString(),
+                bundle.getString("departement").toString(),
+                )
+        )
+        observeSignUp()
+    }
+
+    private fun showTopSnackBar(view: View, message: String) {
+        val snackBar = Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
+
+        val slideInAnimation = AnimationUtils.loadAnimation(view.context, R.anim.slide_in_top)
+        val slideOutAnimation = AnimationUtils.loadAnimation(view.context, R.anim.slide_out_bottom)
+        snackBar.view.animation = slideInAnimation
+        snackBar.addCallback(object : Snackbar.Callback() {
+            override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                snackBar.view.animation = slideOutAnimation
+            }
+        })
+
+        val params = snackBar.view.layoutParams as FrameLayout.LayoutParams
+        params.gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
+        snackBar.view.layoutParams = params
+        snackBar.show()
+    }
+
     override fun onStart() {
         super.onStart()
-        viewModel.getSessionStudent {user->
-            if (user !=null){
-                startActivity(Intent(this@SignUp, HomeScreen::class.java))
+        viewModel.getSessionStudent { user ->
+            if (user != null) {
+                startActivity(Intent(this, HomeScreen::class.java))
+            } else {
+                showTopSnackBar(binding.root, getString(R.string.notFoundUser))
             }
         }
     }
 
-    }
-
-
-
-
-
-
+}

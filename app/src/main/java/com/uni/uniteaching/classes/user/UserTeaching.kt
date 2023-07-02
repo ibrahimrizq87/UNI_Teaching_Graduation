@@ -9,9 +9,4 @@ data class UserTeaching (
     val specialization :String = "",
     val userType:String="",
     var department:String=""
-    //var courses:List<String>
-
-
-
-
 )
