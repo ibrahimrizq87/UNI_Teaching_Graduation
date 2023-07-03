@@ -13,6 +13,5 @@ data class PostData (
     val time: Date = Date(),
     val audience:String="",
     var postUri:Uri=Uri.EMPTY,
-
     var type:Int=0
 )
