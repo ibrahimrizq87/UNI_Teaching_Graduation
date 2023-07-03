@@ -145,7 +145,6 @@ class FirebaseRepoImp@Inject constructor(
                 for(rec in it){
 
                     student =  rec.toObject(UserStudent::class.java)
-                    Log.e("repo student",student.name)
 
                 }
                 result.invoke(
@@ -361,7 +360,6 @@ class FirebaseRepoImp@Inject constructor(
 
             for (rec in snapshot!!) {
                 val post = rec.toObject(Posts::class.java)
-                Log.e("repo section post",post.postID)
 
                 listOfPosts.add(post)
             }
@@ -803,7 +801,6 @@ class FirebaseRepoImp@Inject constructor(
         section: Section,
         result: (Resource<List<Attendance>>) -> Unit
     ) {
-        Log.e("repo view ","i am here")
         val document = database.collection(FireStoreTable.courses).document(section.courseCode)
             .collection(FireStoreTable.sections)
             .document(section.dep)
@@ -815,7 +812,6 @@ class FirebaseRepoImp@Inject constructor(
                 val listOfStudents = arrayListOf<Attendance>()
                 for (rec in it) {
                     val student = rec.toObject(Attendance::class.java)
-                    Log.e("repo view ",student.attendanceID)
                     listOfStudents.add(student)
                 }
                 result.invoke(
@@ -853,7 +849,6 @@ class FirebaseRepoImp@Inject constructor(
         section: Section,
         result: (Resource<String>) -> Unit
     ) {
-        Log.e("repo add atten","${FireStoreTable.courses}||| ${section.courseCode}||| ${FireStoreTable.sections}||| ${section.dep}||| ${section.section}||| ${section.sectionId}||| ")
         val document = database.collection(FireStoreTable.courses)
             .document(section.courseCode)
             .collection(FireStoreTable.sections)
@@ -1024,4 +1019,63 @@ class FirebaseRepoImp@Inject constructor(
         }
         result.invoke(Resource.Success(listOfPosts))
     }
+
+
+
+
+    override suspend fun updateLectureState(
+        lecture: Lecture,
+        state:Boolean,
+
+        result: (Resource<String>) -> Unit
+    ) {
+        val document = database.collection(FireStoreTable.courses).document(lecture.courseCode)
+            .collection(FireStoreTable.lectures).document(lecture.dep).collection(lecture.dep)
+            .document(lecture.lectureId)
+        document.update("hasRunning",state)
+            .addOnSuccessListener {
+                result.invoke(
+                    Resource.Success("lectures updated successfully")
+                )
+            }
+            .addOnFailureListener {
+                result.invoke(
+                    Resource.Failure(
+                        it.localizedMessage
+                    )
+                )
+            }
+
+    }
+
+
+
+
+    override suspend fun updateSectionState(
+        section: Section,
+        state:Boolean,
+        result: (Resource<String>) -> Unit
+    ) {
+        val document = database.collection(FireStoreTable.courses)
+            .document(section.courseCode)
+            .collection(FireStoreTable.sections)
+            .document(section.dep)
+            .collection(section.section)
+            .document(section.sectionId)
+
+        document.update("hasRunning", state)
+            .addOnSuccessListener {
+                result.invoke(
+                    Resource.Success("sections updated successfully")
+                )
+            }
+            .addOnFailureListener {
+                result.invoke(
+                    Resource.Failure(
+                        it.localizedMessage
+                    )
+                )
+            }
+    }
+
 }

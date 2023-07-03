@@ -121,7 +121,6 @@ class ScheduleFragment : Fragment() {
     private fun observeCourses() {
         var sectionList = (activity as HomeScreen).sectionList
         sectionList.forEach {
-            Log.e("schedhdh", it.sectionName)
         }
         lifecycleScope.launchWhenCreated {
             viewModel.getCourse.collectLatest {
@@ -180,7 +179,7 @@ class ScheduleFragment : Fragment() {
                                 it.time,
                                 it.endTime,
                                 ScheduleAdapter.VIEW_TYPE_ONE,
-                                false
+                                it.hasRunning
                             )
                             scheduleList.add(item)
                         }
@@ -219,7 +218,7 @@ class ScheduleFragment : Fragment() {
                                 it.time,
                                 it.endTime,
                                 ScheduleAdapter.VIEW_TYPE_ONE,
-                                false
+                                it.hasRunning
                             )
                             scheduleList.add(item)
                         }

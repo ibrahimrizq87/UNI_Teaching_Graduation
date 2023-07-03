@@ -141,12 +141,12 @@ startActivity(Intent(context,AddPostActivity::class.java))        }
         adapter = PostsAdapter(requireContext(), postsList,
 
             onItemClicked = { _, item ->
-                Log.e("item",item.audience)
+             /*   Log.e("item",item.audience)
                 Log.e("item",item.postID)
                 Log.e("item",item.description)
                 Log.e("item",item.myPost.toString())
                 Log.e("item",item.postUri.toString())
-                Log.e("item",item.type.toString())
+                Log.e("item",item.type.toString())*/
 
                 Toast.makeText(requireContext(), item.authorName, Toast.LENGTH_SHORT).show()
             }, onComment = { _, item ->
@@ -455,8 +455,7 @@ private fun updatePost(){
 
     val sectionList= (activity as HomeScreen).sectionList
     sectionList.forEach {
-        Log.e("home section data",it.sectionName)
-        Log.e("home section data",it.dep)
+
     }
     viewModel.getPostsGeneral()
 
@@ -479,7 +478,6 @@ private fun updatePost(){
                     }
                     is Resource.Success -> {
                         state.result.forEach {
-                            Log.e("home section post", it.postID)
                             var post = PostData(
                                 it.description,
                                 it.authorName,

@@ -430,5 +430,23 @@ class FirebaseViewModel @Inject constructor(
         }
     }
 
+
+
+
+    private val _updateScheduleState = MutableStateFlow<Resource<String>?>(null)
+    val updateScheduleState = _updateScheduleState.asStateFlow()
+
+    fun updateLectureState(lecture: Lecture, state:Boolean) = viewModelScope.launch {
+        _updateScheduleState.value = Resource.Loading
+        repository.updateLectureState(lecture,state) {
+            _updateScheduleState.value = it
+        }
+    }
+    fun updateSectionState(section: Section,state: Boolean) = viewModelScope.launch {
+        _updateScheduleState.value = Resource.Loading
+        repository.updateSectionState(section,state) {
+            _updateScheduleState.value = it
+        }
+    }
 }
 

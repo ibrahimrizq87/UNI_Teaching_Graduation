@@ -108,7 +108,16 @@ interface FirebaseRepo {
     )
     fun getLectures(courses: List<Courses>, dep:String, result: (Resource<List<Lecture>>) -> Unit)
 
-
+    suspend fun updateSectionState(
+        section: Section,
+        state:Boolean,
+        result: (Resource<String>) -> Unit
+    )
+    suspend fun updateLectureState(
+        lecture: Lecture,
+        state:Boolean,
+        result: (Resource<String>) -> Unit
+    )
     suspend fun getCourseByAssistantCode( assistantCode:String,result: (Resource<List<Courses>>) -> Unit)
     suspend fun  getCourseByProfessorCode( professorCode:String,result: (Resource<List<Courses>>) -> Unit)
     suspend fun getSectionAttendance(
