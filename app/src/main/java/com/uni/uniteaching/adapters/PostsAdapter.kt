@@ -67,10 +67,10 @@ class PostsAdapter(
 
         }else{
             (holder as ViewHolder1)
-            /* Glide.with(context)
-                 .load(currentItem.imageUrl)
+             Glide.with(context)
+                 .load(currentItem.postUri)
                  .into(holder.image)
- */
+
             holder.auth.text = currentItem.authorName
             holder.audience.text = currentItem.audience
             holder.text.text = currentItem.description
