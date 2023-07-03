@@ -18,6 +18,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import com.uni.uniteaching.R
 import com.uni.uniteaching.adapters.PostsAdapter
 import com.uni.uniteaching.classes.Courses
@@ -81,11 +83,11 @@ class HomeScreenFragment : Fragment() {
     private lateinit var addScheduleBtnTxt: TextView
     private lateinit var addCourseBtnTxt: TextView
     private lateinit var postsList: MutableList<PostData>
-
+    lateinit var mStorageRef: StorageReference
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-
+        mStorageRef = FirebaseStorage.getInstance().reference
 
 // update user data --------------------------------------------------------------------------------
         currentUser = UserTeaching()
@@ -342,8 +344,10 @@ startActivity(Intent(context,AddPostActivity::class.java))        }
                             }
 
                             if(it.type == PostsAdapter.WITH_IMAGE){
-                                storageViewModel.getPostUri(it.postID)
-                                observeImage(post)
+                                // storageViewModel.getPostUri(it.postID)
+                                downloadImage(it.postID,post)
+
+                                //observeImage(post)
 
                             }else{
                                 postsList.add(post)
@@ -429,8 +433,10 @@ startActivity(Intent(context,AddPostActivity::class.java))        }
                                 post.myPost = true
                             }
                             if(it.type == PostsAdapter.WITH_IMAGE){
-                                storageViewModel.getPostUri(it.postID)
-                                observeImage(post)
+                                // storageViewModel.getPostUri(it.postID)
+                                downloadImage(it.postID,post)
+
+                                //observeImage(post)
 
                             }else{
                                 postsList.add(post)
@@ -493,8 +499,10 @@ private fun updatePost(){
                                 post.myPost = true
                             }
                             if (it.type == PostsAdapter.WITH_IMAGE) {
-                                storageViewModel.getPostUri(it.postID)
-                                observeImage(post)
+                                // storageViewModel.getPostUri(it.postID)
+                                downloadImage(it.postID,post)
+
+                                //observeImage(post)
 
                             } else {
                                 postsList.add(post)
@@ -513,6 +521,20 @@ private fun updatePost(){
                     else -> {}
                 }
             }
+        }
+    }
+    fun downloadImage(id:String,post: PostData){
+        val downloadUriTask=mStorageRef.child("posts/$id.png").downloadUrl
+        downloadUriTask.addOnSuccessListener {
+            post.postUri=it
+            if(postsList.indexOf(post)==-1){
+                postsList.add(post)
+            }
+
+            adapter.update(postsList)
+        }.addOnFailureListener {
+            Toast.makeText(context, it.toString(), Toast.LENGTH_LONG)
+                .show()
         }
     }
 }

@@ -292,8 +292,10 @@ if (currentUser.userType==UserTypes.assistantUser){
                         }
                         is Resource.Success -> {
                             studentsList.clear()
-                            studentsList.add(it.result)
-                            recyAdapter.update(studentsList)}
+                            val student=it.result
+                            if(student.name.isNotEmpty()){studentsList.add(student)
+                                recyAdapter.update(studentsList)}
+                            }
                         is Resource.Failure -> {
                             Toast.makeText(this@AddPostActivity,it.exception, Toast.LENGTH_SHORT).show()
                         }
