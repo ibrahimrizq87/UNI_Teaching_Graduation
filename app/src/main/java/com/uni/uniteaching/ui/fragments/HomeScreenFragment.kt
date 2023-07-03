@@ -1,5 +1,7 @@
 package com.uni.uniteaching.ui.fragments
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -14,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.uni.uniteaching.R
 import com.uni.uniteaching.adapters.PostsAdapter
@@ -27,6 +30,7 @@ import com.uni.uniteaching.data.Resource
 import com.uni.uniteaching.data.di.PostType
 import com.uni.uniteaching.data.di.UserTypes
 import com.uni.uniteaching.databinding.FragmentHomeScreenBinding
+import com.uni.uniteaching.ui.AddPostActivity
 import com.uni.uniteaching.ui.HomeScreen
 import com.uni.uniteaching.viewModel.AuthViewModel
 import com.uni.uniteaching.viewModel.FireStorageViewModel
@@ -105,11 +109,9 @@ class HomeScreenFragment : Fragment() {
         addScheduleBtnTxt = binding.addScheduleBtnTxt
         addCourseBtnTxt = binding.addCourseBtnTxt
 
-
-
         binding.addFloatingBtn.setOnClickListener {
-            replaceFragment(AddPostFragment())
-        }
+
+startActivity(Intent(context,AddPostActivity::class.java))        }
 
 
         return binding.root
@@ -120,60 +122,6 @@ class HomeScreenFragment : Fragment() {
             .addToBackStack(null).commit()
     }
 
-/*
-    private fun onAddClicked() {
-        isFloatingBtnClick = !isFloatingBtnClick
-        btnAddSchedule.animation = null
-        btnAddCourse.animation = null
-        btnAddPost.animation = null
-        binding.addFloatingBtn.animation = null
-
-        if (isFloatingBtnClick) {
-            openFloatingButton()
-        } else {
-            closeFloatingButton()
-        }
-    }
-
-    private fun openFloatingButton() {
-
-
-
-        btnAddPost.visibility = View.VISIBLE
-
-        createPostBtnTxt.visibility = View.VISIBLE
-
-
-        createPostBtnTxt.animation = fromBottom
-
-
-
-        btnAddPost.animation = fromBottom
-        binding.addFloatingBtn.animation = rotateOpen
-    }
-
-    private fun closeFloatingButton() {
-
-
-        createPostBtnTxt.animation = toBottom
-        addScheduleBtnTxt.animation = toBottom
-        addCourseBtnTxt.animation = toBottom
-
-        btnAddSchedule.animation = toBottom
-        btnAddCourse.animation = toBottom
-        btnAddPost.animation = toBottom
-
-        binding.addFloatingBtn.animation = rotateClose
-
-        btnAddSchedule.visibility = View.GONE
-        btnAddCourse.visibility = View.GONE
-        btnAddPost.visibility = View.GONE
-
-        createPostBtnTxt.visibility = View.GONE
-        addScheduleBtnTxt.visibility = View.GONE
-        addCourseBtnTxt.visibility = View.GONE
-    }
-*/
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val recyclerView = view.findViewById<RecyclerView>(R.id.home_recycler)
@@ -193,6 +141,13 @@ class HomeScreenFragment : Fragment() {
         adapter = PostsAdapter(requireContext(), postsList,
 
             onItemClicked = { _, item ->
+                Log.e("item",item.audience)
+                Log.e("item",item.postID)
+                Log.e("item",item.description)
+                Log.e("item",item.myPost.toString())
+                Log.e("item",item.postUri.toString())
+                Log.e("item",item.type.toString())
+
                 Toast.makeText(requireContext(), item.authorName, Toast.LENGTH_SHORT).show()
             }, onComment = { _, item ->
                 val bundle = Bundle()
@@ -277,6 +232,7 @@ class HomeScreenFragment : Fragment() {
                     }
                     is Resource.Success -> {
                         Toast.makeText(context,state.result,Toast.LENGTH_SHORT).show()
+                        progress.visibility = View.INVISIBLE
                     }
                     is Resource.Failure -> {
                         progress.visibility = View.INVISIBLE
@@ -343,6 +299,7 @@ class HomeScreenFragment : Fragment() {
 
                     is Resource.Success -> {
                         Toast.makeText(context, state.result, Toast.LENGTH_SHORT).show()
+                        updatePost()
                     }
 
                     is Resource.Failure -> {
@@ -376,13 +333,26 @@ class HomeScreenFragment : Fragment() {
                                 it.courseID,
                                 it.time,
                                 it.audience,
+                                Uri.EMPTY,
                                 it.type
                             )
+
                             if (it.authorId == currentUser.userId) {
                                 post.myPost = true
                             }
-                            postsList.add(post)
+
+                            if(it.type == PostsAdapter.WITH_IMAGE){
+                                storageViewModel.getPostUri(it.postID)
+                                observeImage(post)
+
+                            }else{
+                                postsList.add(post)
+                            }
+
+
                         }
+
+
                         adapter.update(postsList)
                         if (currentUser.userType!=UserTypes.assistantUser){
                             adapter.update(postsList)
@@ -402,6 +372,37 @@ class HomeScreenFragment : Fragment() {
         }
     }
 
+    private fun observeImage(post: PostData) {
+        lifecycleScope.launchWhenCreated {
+            storageViewModel.getPostUri.collectLatest { uri ->
+                when (uri) {
+                    is Resource.Loading -> {
+                    }
+
+                    is Resource.Success -> {
+
+                    post.postUri=uri.result
+                        if (postsList.indexOf(post) == -1){
+                        postsList.add(post)
+                            adapter.update(postsList)
+                        }
+
+
+                    }
+
+
+                    is Resource.Failure -> {
+                        Toast.makeText(context, uri.exception.toString(), Toast.LENGTH_LONG)
+                            .show()
+                    }
+
+                    else -> {
+                    }
+                }
+    }
+        }
+    }
+
     private fun observe() {
         lifecycleScope.launchWhenCreated {
             viewModel.getPosts.collectLatest { state ->
@@ -413,7 +414,6 @@ class HomeScreenFragment : Fragment() {
                     is Resource.Success -> {
                         postsList.clear()
                         state.result.forEach {
-
                             var post = PostData(
                                 it.description,
                                 it.authorName,
@@ -422,12 +422,19 @@ class HomeScreenFragment : Fragment() {
                                 it.courseID,
                                 it.time,
                                 it.audience,
+                                Uri.EMPTY,
                                 it.type
                             )
                             if (it.authorId == currentUser.userId) {
                                 post.myPost = true
                             }
-                            postsList.add(post)
+                            if(it.type == PostsAdapter.WITH_IMAGE){
+                                storageViewModel.getPostUri(it.postID)
+                                observeImage(post)
+
+                            }else{
+                                postsList.add(post)
+                            }
                         }
                         progress.visibility = View.INVISIBLE
                     }
@@ -472,7 +479,7 @@ private fun updatePost(){
                     }
                     is Resource.Success -> {
                         state.result.forEach {
-                            Log.e("home section post",it.postID)
+                            Log.e("home section post", it.postID)
                             var post = PostData(
                                 it.description,
                                 it.authorName,
@@ -481,12 +488,19 @@ private fun updatePost(){
                                 it.courseID,
                                 it.time,
                                 it.audience,
+                                Uri.EMPTY,
                                 it.type
                             )
                             if (it.authorId == currentUser.userId) {
                                 post.myPost = true
                             }
-                            postsList.add(post)
+                            if (it.type == PostsAdapter.WITH_IMAGE) {
+                                storageViewModel.getPostUri(it.postID)
+                                observeImage(post)
+
+                            } else {
+                                postsList.add(post)
+                            }
                         }
                         adapter.update(postsList)
                         progress.visibility = View.INVISIBLE
@@ -504,4 +518,5 @@ private fun updatePost(){
         }
     }
 }
+
 

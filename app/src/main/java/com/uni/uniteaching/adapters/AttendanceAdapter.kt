@@ -25,20 +25,12 @@ class AttendanceAdapter (
             val view : View = LayoutInflater.from(context).inflate(R.layout.attendance_item,parent,false)
             return myViewHolder(view)
         }
-
         override fun onBindViewHolder(holder: myViewHolder, position: Int) {
             val currentItem = attendanceList[position]
-
-
-
             holder.name.text = currentItem.userName
             holder.code.text = currentItem.userCode
             holder.time.text = currentItem.time.toString()
-
-
-
-
-        }
+     }
         fun update(list: MutableList<Attendance>){
             this.attendanceList=list
             notifyDataSetChanged()

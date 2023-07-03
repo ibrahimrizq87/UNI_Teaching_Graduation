@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.activity.viewModels
@@ -25,9 +26,11 @@ import com.uni.uniteaching.ui.signUp.SignUp
 import com.uni.uniteaching.viewModel.AuthViewModel
 import com.uni.uniteaching.viewModel.FireStorageViewModel
 import com.uni.uniteaching.viewModel.FirebaseViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import java.util.*
 
+@AndroidEntryPoint
 class AddPostActivity : AppCompatActivity() {
     private val viewModelAuth : AuthViewModel by viewModels()
     private val fireStorageViewModel : FireStorageViewModel by viewModels()
@@ -47,9 +50,11 @@ var grade=""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_post)
+        currentUser= UserTeaching()
         viewModelAuth.getSessionStudent {user->
             if (user != null){
                 currentUser = user
+                Log.e("add post",user.name)
             }else
             {
                 Toast.makeText(this,"there is an error on loading user data", Toast.LENGTH_SHORT).show()
@@ -58,7 +63,7 @@ var grade=""
         }
         chooseGrade()
             studentsList= arrayListOf()
-            currentUser= UserTeaching()
+
 
 
             imageView=findViewById(R.id.post_image)
@@ -203,6 +208,7 @@ var grade=""
                 //TODO any here is making an error
                 if (department.isNotEmpty()&&section.isNotEmpty()&&description.isNotEmpty()){
                     if (userImageUri == Uri.EMPTY){
+                        Log.e("add post2",currentUser.name)
                         viewModel.addPostSection(
                             Posts(
                                 description
