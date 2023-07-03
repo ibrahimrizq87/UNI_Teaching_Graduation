@@ -63,12 +63,12 @@ class ScheduleFragment : Fragment() {
 
 
         adapter = ScheduleAdapter(requireContext(), scheduleList,
-            onItemClick = {item->
+            onItemClick = { item ->
                 if (item.type == ScheduleAdapter.VIEW_TYPE_ONE) {
-                bundle.putString("course", item.courseID)
-                bundle.putString("dep", item.dep)
-                bundle.putString("section", item.section)
-                bundle.putString("id", item.eventId)
+                    bundle.putString("course", item.courseID)
+                    bundle.putString("dep", item.dep)
+                    bundle.putString("section", item.section)
+                    bundle.putString("id", item.eventId)
                 } else {
                     bundle.putString("course", item.courseID)
                     bundle.putString("dep", item.dep)
@@ -78,11 +78,10 @@ class ScheduleFragment : Fragment() {
                 val viewAttendanceFragment = ViewAttendanceFragment()
                 viewAttendanceFragment.arguments = bundle
                 (activity as HomeScreen).replaceFragment(viewAttendanceFragment)
-                }
-            ,
+            },
 
-            onAttendClicked = {  item ->
-val intent= Intent(requireContext(), Scan::class.java)
+            onAttendClicked = { item ->
+                val intent = Intent(requireContext(), Scan::class.java)
                 if (item.type == ScheduleAdapter.VIEW_TYPE_ONE) {
                     intent.putExtra("course", item.courseID)
                     intent.putExtra("dep", item.dep)
@@ -104,9 +103,9 @@ val intent= Intent(requireContext(), Scan::class.java)
         binding.recyclerSchedule.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerSchedule.adapter = adapter
 
-        if (currentUser.userType== UserTypes.assistantUser){
+        if (currentUser.userType == UserTypes.assistantUser) {
             viewModel.getCoursesByAssistantID(currentUser.code)
-        }else{
+        } else {
             viewModel.getCoursesByProfessorID(currentUser.code)
         }
 
@@ -115,41 +114,45 @@ val intent= Intent(requireContext(), Scan::class.java)
 
         return binding.root
     }
-   /* fun setListener(dataPasser1: DataPasser){
-        dataPasser = dataPasser1
-    }*/
+
+    /* fun setListener(dataPasser1: DataPasser){
+         dataPasser = dataPasser1
+     }*/
     private fun observeCourses() {
-        var sectionList=(activity as HomeScreen).sectionList
-       sectionList.forEach {
-           Log.e("schedhdh",it.sectionName)
-       }
+        var sectionList = (activity as HomeScreen).sectionList
+        sectionList.forEach {
+            Log.e("schedhdh", it.sectionName)
+        }
         lifecycleScope.launchWhenCreated {
             viewModel.getCourse.collectLatest {
                 when (it) {
                     is Resource.Loading -> {
                     }
+
                     is Resource.Success -> {
                         coursesList.clear()
                         it.result.forEach {
                             coursesList.add(it)
                         }
-                        if (currentUser.userType==UserTypes.assistantUser){
+                        if (currentUser.userType == UserTypes.assistantUser) {
 
                             viewModel.getSection(sectionList)
                             delay(300)
                             observeSection()
 
-                        }else{
-                            viewModel.getLecture(coursesList,currentUser.department)
+                        } else {
+                            viewModel.getLecture(coursesList, currentUser.department)
                             delay(300)
                             observeLecture()
                         }
 
                     }
+
                     is Resource.Failure -> {
-                        Toast.makeText(requireContext(),it.exception, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), it.exception, Toast.LENGTH_SHORT).show()
                     }
-                    else->{}
+
+                    else -> {}
                 }
             }
         }
@@ -161,30 +164,34 @@ val intent= Intent(requireContext(), Scan::class.java)
                 when (it) {
                     is Resource.Loading -> {
                     }
+
                     is Resource.Success -> {
                         scheduleList.clear()
                         it.result.forEach {
-                            val item=ScheduleDataType(
-                                it.lectureId
-                                ,it.courseName
-                                ,it.courseCode
-                                ,it.hallID
-                                ,""
-                                ,it.dep
-                                ,it.professorName
-                                ,it.day
-                                ,it.time
-                                ,it.endTime
-                                ,ScheduleAdapter.VIEW_TYPE_ONE
-                                ,false)
+                            val item = ScheduleDataType(
+                                it.lectureId,
+                                it.courseName,
+                                it.courseCode,
+                                it.hallID,
+                                "",
+                                it.dep,
+                                it.professorName,
+                                it.day,
+                                it.time,
+                                it.endTime,
+                                ScheduleAdapter.VIEW_TYPE_ONE,
+                                false
+                            )
                             scheduleList.add(item)
                         }
                         adapter.update(scheduleList)
                     }
+
                     is Resource.Failure -> {
-                        Toast.makeText(requireContext(),it.exception, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), it.exception, Toast.LENGTH_SHORT).show()
                     }
-                    else->{}
+
+                    else -> {}
                 }
             }
         }
@@ -196,30 +203,34 @@ val intent= Intent(requireContext(), Scan::class.java)
                 when (it) {
                     is Resource.Loading -> {
                     }
+
                     is Resource.Success -> {
                         scheduleList.clear()
                         it.result.forEach {
-                            val item=ScheduleDataType(
-                                it.sectionId
-                                ,it.courseName
-                                ,it.courseCode
-                                ,it.lapID
-                                ,it.section
-                                ,it.dep
-                                ,it.assistantName
-                                ,it.day
-                                ,it.time
-                                ,it.endTime
-                                ,ScheduleAdapter.VIEW_TYPE_ONE
-                                ,false)
+                            val item = ScheduleDataType(
+                                it.sectionId,
+                                it.courseName,
+                                it.courseCode,
+                                it.lapID,
+                                it.section,
+                                it.dep,
+                                it.assistantName,
+                                it.day,
+                                it.time,
+                                it.endTime,
+                                ScheduleAdapter.VIEW_TYPE_ONE,
+                                false
+                            )
                             scheduleList.add(item)
                         }
-adapter.update(scheduleList)
+                        adapter.update(scheduleList)
                     }
+
                     is Resource.Failure -> {
-                        Toast.makeText(requireContext(),it.exception, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), it.exception, Toast.LENGTH_SHORT).show()
                     }
-                    else->{}
+
+                    else -> {}
                 }
             }
         }

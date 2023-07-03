@@ -218,6 +218,7 @@
     <string name="search_by_student_id">Search by Student ID</string>
     <string name="search">Search</string>
     <string name="teaching">Teaching</string>
-
+    <string name="start_succeeded">Start succeeded</string>
+    <string name="notOurCode">This is not our code!</string>
 
 </resources>

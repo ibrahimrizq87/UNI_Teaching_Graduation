@@ -18,6 +18,7 @@ import com.google.android.gms.vision.barcode.Barcode
 import com.google.android.gms.vision.barcode.BarcodeDetector
 import com.uni.uniteaching.R
 import com.uni.uniteaching.databinding.ActivityScanBinding
+import com.uni.uniteaching.ui.fragments.CustomDialog
 
 import java.io.IOException
 
@@ -28,15 +29,17 @@ class Scan : AppCompatActivity() {
     private var scannedValue = ""
     private lateinit var binding: ActivityScanBinding
     private var isPermissionDenied = false
+    private lateinit var customDialog: CustomDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityScanBinding.inflate(layoutInflater)
+        customDialog = CustomDialog(this)
         setContentView(binding.root)
 
         binding.icBack.setOnClickListener { finish() }
 
-
+        
         val permission =
             ContextCompat.checkSelfPermission(this@Scan, android.Manifest.permission.CAMERA)
         if (permission != PackageManager.PERMISSION_GRANTED
@@ -127,12 +130,12 @@ class Scan : AppCompatActivity() {
 
                         } else {
                             runOnUiThread {
-                                ////customDialog.showNotOurCode() TODO @Walid
+                               customDialog.showNotOurCode() //TODO @Walid
                             }
                         }
                     } else {
                         runOnUiThread {
-                           /// customDialog.showNotOurCode() TODO @Walid
+                          customDialog.showNotOurCode() //TODO @Walid
                         }
                     }
                 }
@@ -166,6 +169,7 @@ class Scan : AppCompatActivity() {
             } else {
                 isPermissionDenied = true
                 Toast.makeText(applicationContext, R.string.permissionDenied, Toast.LENGTH_SHORT).show()
+
             }
         }
     }
