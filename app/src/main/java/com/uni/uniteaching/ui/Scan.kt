@@ -65,9 +65,7 @@ class Scan : AppCompatActivity() {
         id = intent.getStringExtra("id")!!
         binding.icBack.setOnClickListener { finish() }
 
-<<<<<<< HEAD
 
-=======
         binding.startSession.setOnClickListener {
             if (hallId.isNotEmpty()&&code.isNotEmpty()){
                 viewModelRealTime.startGeneratingCode(Hall(hallId,true))
@@ -104,7 +102,7 @@ class Scan : AppCompatActivity() {
             }
 
         }
->>>>>>> fdb45154eae5731845f953c85250110199b9af20
+
         val permission =
             ContextCompat.checkSelfPermission(this@Scan, android.Manifest.permission.CAMERA)
         if (permission != PackageManager.PERMISSION_GRANTED

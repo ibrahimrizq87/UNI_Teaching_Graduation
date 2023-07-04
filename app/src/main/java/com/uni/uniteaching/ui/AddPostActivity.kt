@@ -278,17 +278,12 @@ class AddPostActivity : AppCompatActivity() {
             viewModel.getCoursesByProfessorID(currentUser.code)
         }
 
-<<<<<<< HEAD
+
         observeCourses()
 
     }
 
-    private fun observeStudents() {
-        lifecycleScope.launchWhenCreated {
-            viewModel.searchStudentByID.collectLatest {
-                when (it) {
-                    is Resource.Loading -> {
-=======
+
         private fun observeStudents() {
             lifecycleScope.launchWhenCreated {
                 viewModel.searchStudentByID.collectLatest {
@@ -305,25 +300,14 @@ class AddPostActivity : AppCompatActivity() {
                             Toast.makeText(this@AddPostActivity,it.exception, Toast.LENGTH_SHORT).show()
                         }
                         else->{}
->>>>>>> fdb45154eae5731845f953c85250110199b9af20
+
                     }
 
-                    is Resource.Success -> {
-                        studentsList.clear()
-                        studentsList.add(it.result)
-                        recyAdapter.update(studentsList)
-                    }
 
-                    is Resource.Failure -> {
-                        Toast.makeText(this@AddPostActivity, it.exception, Toast.LENGTH_SHORT)
-                            .show()
-                    }
-
-                    else -> {}
                 }
             }
         }
-    }
+
 
     private fun observePost(hasImage: Boolean, uri: Uri) {
         if (hasImage) {
