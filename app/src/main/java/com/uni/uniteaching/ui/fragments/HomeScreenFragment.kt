@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.bumptech.glide.Glide
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.uni.uniteaching.R
 import com.uni.uniteaching.adapters.PostsAdapter
@@ -92,6 +93,8 @@ class HomeScreenFragment : Fragment() {
         authViewModel.getSessionStudent { user ->
             if (user != null) {
                 currentUser = user
+                (activity as HomeScreen).findViewById<BottomNavigationView>(R.id.bottomNavigationView).visibility =
+                    View.VISIBLE
             } else {
                 Toast.makeText(
                     context, "there is an error on loading user data", Toast.LENGTH_SHORT
@@ -111,7 +114,8 @@ class HomeScreenFragment : Fragment() {
 
         binding.addFloatingBtn.setOnClickListener {
 
-startActivity(Intent(context,AddPostActivity::class.java))        }
+            startActivity(Intent(context, AddPostActivity::class.java))
+        }
 
 
         return binding.root
@@ -135,18 +139,18 @@ startActivity(Intent(context,AddPostActivity::class.java))        }
 
         swipeRefreshLayout.setOnRefreshListener {
             swipeRefreshLayout.isRefreshing = false
-          updatePost()
+            updatePost()
         }
 
         adapter = PostsAdapter(requireContext(), postsList,
 
             onItemClicked = { _, item ->
-                Log.e("item",item.audience)
-                Log.e("item",item.postID)
-                Log.e("item",item.description)
-                Log.e("item",item.myPost.toString())
-                Log.e("item",item.postUri.toString())
-                Log.e("item",item.type.toString())
+                Log.e("item", item.audience)
+                Log.e("item", item.postID)
+                Log.e("item", item.description)
+                Log.e("item", item.myPost.toString())
+                Log.e("item", item.postUri.toString())
+                Log.e("item", item.type.toString())
 
                 Toast.makeText(requireContext(), item.authorName, Toast.LENGTH_SHORT).show()
             }, onComment = { _, item ->
@@ -186,7 +190,7 @@ startActivity(Intent(context,AddPostActivity::class.java))        }
                 (activity as HomeScreen).replaceFragment(commentFragment)
 
             }, deletePost = { post ->
-                if (post.type==PostsAdapter.WITH_IMAGE){
+                if (post.type == PostsAdapter.WITH_IMAGE) {
                     storageViewModel.deletePostImage(post.postID)
                     observeDeletedImage()
                 }
@@ -195,6 +199,7 @@ startActivity(Intent(context,AddPostActivity::class.java))        }
                     PostType.course -> {
                         viewModel.deletePostCourse(post.postID, post.courseID)
                     }
+
                     PostType.section_posts -> {
                         val location = post.courseID.split("/")
 
@@ -218,11 +223,12 @@ startActivity(Intent(context,AddPostActivity::class.java))        }
 //-------------- setting the recycler data---------------------------//
 
 
-    updatePost()
-    observeCourses()
+        updatePost()
+        observeCourses()
 
 
     }
+
     private fun observeDeletedImage() {
         lifecycleScope.launchWhenCreated {
             storageViewModel.deletePostImage.collectLatest { state ->
@@ -230,15 +236,18 @@ startActivity(Intent(context,AddPostActivity::class.java))        }
                     is Resource.Loading -> {
                         progress.visibility = View.VISIBLE
                     }
+
                     is Resource.Success -> {
-                        Toast.makeText(context,state.result,Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, state.result, Toast.LENGTH_SHORT).show()
                         progress.visibility = View.INVISIBLE
                     }
+
                     is Resource.Failure -> {
                         progress.visibility = View.INVISIBLE
                         Toast.makeText(context, state.exception.toString(), Toast.LENGTH_LONG)
                             .show()
                     }
+
                     else -> {}
                 }
             }
@@ -252,6 +261,7 @@ startActivity(Intent(context,AddPostActivity::class.java))        }
                     is Resource.Loading -> {
                         progress.visibility = View.VISIBLE
                     }
+
                     is Resource.Success -> {
                         coursesList.clear()
 
@@ -341,11 +351,11 @@ startActivity(Intent(context,AddPostActivity::class.java))        }
                                 post.myPost = true
                             }
 
-                            if(it.type == PostsAdapter.WITH_IMAGE){
+                            if (it.type == PostsAdapter.WITH_IMAGE) {
                                 storageViewModel.getPostUri(it.postID)
                                 observeImage(post)
 
-                            }else{
+                            } else {
                                 postsList.add(post)
                             }
 
@@ -354,7 +364,7 @@ startActivity(Intent(context,AddPostActivity::class.java))        }
 
 
                         adapter.update(postsList)
-                        if (currentUser.userType!=UserTypes.assistantUser){
+                        if (currentUser.userType != UserTypes.assistantUser) {
                             adapter.update(postsList)
                         }
 
@@ -381,9 +391,9 @@ startActivity(Intent(context,AddPostActivity::class.java))        }
 
                     is Resource.Success -> {
 
-                    post.postUri=uri.result
-                        if (postsList.indexOf(post) == -1){
-                        postsList.add(post)
+                        post.postUri = uri.result
+                        if (postsList.indexOf(post) == -1) {
+                            postsList.add(post)
                             adapter.update(postsList)
                         }
 
@@ -399,7 +409,7 @@ startActivity(Intent(context,AddPostActivity::class.java))        }
                     else -> {
                     }
                 }
-    }
+            }
         }
     }
 
@@ -428,11 +438,11 @@ startActivity(Intent(context,AddPostActivity::class.java))        }
                             if (it.authorId == currentUser.userId) {
                                 post.myPost = true
                             }
-                            if(it.type == PostsAdapter.WITH_IMAGE){
+                            if (it.type == PostsAdapter.WITH_IMAGE) {
                                 storageViewModel.getPostUri(it.postID)
                                 observeImage(post)
 
-                            }else{
+                            } else {
                                 postsList.add(post)
                             }
                         }
@@ -450,25 +460,26 @@ startActivity(Intent(context,AddPostActivity::class.java))        }
             }
         }
     }
-private fun updatePost(){
-    postsList.clear()
 
-    val sectionList= (activity as HomeScreen).sectionList
-    sectionList.forEach {
-        Log.e("home section data",it.sectionName)
-        Log.e("home section data",it.dep)
+    private fun updatePost() {
+        postsList.clear()
+
+        val sectionList = (activity as HomeScreen).sectionList
+        sectionList.forEach {
+            Log.e("home section data", it.sectionName)
+            Log.e("home section data", it.dep)
+        }
+        viewModel.getPostsGeneral()
+
+        if (currentUser.userType == UserTypes.assistantUser) {
+            viewModel.getSectionPost(sectionList)
+            viewModel.getCoursesByAssistantID(currentUser.code)
+        } else {
+            viewModel.getCoursesByProfessorID(currentUser.code)
+        }
+
+
     }
-    viewModel.getPostsGeneral()
-
-    if (currentUser.userType == UserTypes.assistantUser){
-        viewModel.getSectionPost(sectionList)
-        viewModel.getCoursesByAssistantID(currentUser.code)
-    }else{
-        viewModel.getCoursesByProfessorID(currentUser.code)
-    }
-
-
-}
 
     private fun observeSectionPost() {
         lifecycleScope.launchWhenCreated {
@@ -477,6 +488,7 @@ private fun updatePost(){
                     is Resource.Loading -> {
                         progress.visibility = View.VISIBLE
                     }
+
                     is Resource.Success -> {
                         state.result.forEach {
                             Log.e("home section post", it.postID)

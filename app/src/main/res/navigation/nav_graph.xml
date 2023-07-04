@@ -8,7 +8,7 @@
 
     <fragment
         android:id="@+id/scheduleFragment"
-        android:name="com.uni.unistudent.ui.fragments.ScheduleFragment"
+        android:name="com.uni.uniteaching.ui.fragments.ScheduleFragment"
         android:label="fragment_schedule"
         tools:layout="@layout/fragment_schedule" >
         <action
@@ -17,7 +17,7 @@
     </fragment>
     <fragment
         android:id="@+id/attendanceFragment"
-        android:name="com.uni.unistudent.ui.fragments.AttendanceFragment"
+        android:name="com.uni.uniteaching.ui.fragments.AttendanceFragment"
         android:label="fragment_attendance"
         tools:layout="@layout/fragment_attendance" >
         <action
@@ -26,7 +26,7 @@
     </fragment>
     <fragment
         android:id="@+id/homeMainFragment"
-        android:name="com.uni.unistudent.ui.fragments.HomeFragment"
+        android:name="com.uni.uniteaching.ui.fragments.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_main_home" >
         <action
@@ -35,7 +35,7 @@
     </fragment>
     <fragment
         android:id="@+id/commentFragment"
-        android:name="com.uni.unistudent.ui.fragments.CommentFragment"
+        android:name="com.uni.uniteaching.ui.fragments.CommentFragment"
         android:label="fragment_comment"
         tools:layout="@layout/fragment_comment" >
         <action

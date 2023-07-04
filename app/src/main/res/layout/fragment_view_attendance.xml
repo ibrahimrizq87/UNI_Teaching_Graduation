@@ -16,10 +16,11 @@
             android:id="@+id/add_attendance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="add attendance"
+            android:text="Add attendance"
             android:textSize="@dimen/text_size_14"
             android:textStyle="bold"
+            android:textAllCaps="false"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

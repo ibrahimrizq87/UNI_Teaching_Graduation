@@ -39,7 +39,7 @@ class Scan : AppCompatActivity() {
 
         binding.icBack.setOnClickListener { finish() }
 
-        
+
         val permission =
             ContextCompat.checkSelfPermission(this@Scan, android.Manifest.permission.CAMERA)
         if (permission != PackageManager.PERMISSION_GRANTED

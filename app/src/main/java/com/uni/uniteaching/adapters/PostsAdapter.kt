@@ -2,10 +2,11 @@ package com.uni.uniteaching.adapters
 
 
 import android.content.Context
+import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.uni.uniteaching.R
 import com.uni.uniteaching.classes.PostData
+import java.util.Date
 
 
 class PostsAdapter(
@@ -59,7 +61,7 @@ class PostsAdapter(
             holder.auth.text = currentItem.authorName
             holder.audience.text = currentItem.audience
             holder.text.text = currentItem.description
-
+            holder.post_time_text_without.text = formatDate(currentItem.time)
 
             if (!currentItem.myPost){
                 holder.deletePost_bt.visibility=View.INVISIBLE
@@ -74,6 +76,7 @@ class PostsAdapter(
             holder.auth.text = currentItem.authorName
             holder.audience.text = currentItem.audience
             holder.text.text = currentItem.description
+            holder.post_time_text_with.text = formatDate(currentItem.time)
             if (!currentItem.myPost){
                 holder.deletePost_bt.visibility=View.INVISIBLE
             }
@@ -97,9 +100,10 @@ class PostsAdapter(
         val auth = item.findViewById<TextView>(R.id.auth_with)
         val audience = item.findViewById<TextView>(R.id.audience_with)
         val text = item.findViewById<TextView>(R.id.text_with)
-        val addComment = item.findViewById<Button>(R.id.bt_comment)
+        val post_time_text_with = item.findViewById<TextView>(R.id.post_time_text_with)
+        val addComment = item.findViewById<ImageButton>(R.id.comments_with_Img)
         val recyItem = item.findViewById<ConstraintLayout>(R.id.post_item_with)
-        val deletePost_bt = item.findViewById<Button>(R.id.delete_post_bt)
+        val deletePost_bt = item.findViewById<ImageButton>(R.id.delete_with_Img)
 
         init {
             deletePost_bt.setOnClickListener {
@@ -121,9 +125,10 @@ class PostsAdapter(
         val auth = item.findViewById<TextView>(R.id.auth_without)
         val audience = item.findViewById<TextView>(R.id.audience_without)
         val text = item.findViewById<TextView>(R.id.text_without)
-        val addComment = item.findViewById<Button>(R.id.bt_comment_without)
+        val post_time_text_without = item.findViewById<TextView>(R.id.post_time_text_without)
+        val addComment = item.findViewById<ImageButton>(R.id.comments_without_Img)
         val recyItem = item.findViewById<ConstraintLayout>(R.id.post_item_without)
-        val deletePost_bt = item.findViewById<Button>(R.id.delete_post_bt_without)
+        val deletePost_bt = item.findViewById<ImageButton>(R.id.delete_without_Img)
 
         init {
             deletePost_bt.setOnClickListener {
@@ -138,7 +143,30 @@ class PostsAdapter(
 
         }
     }
+    private fun formatDate(date: Date): String {
+        val currentTimeMillis = System.currentTimeMillis()
+        val inputTimeMillis = date.time
+        val timeDifference = currentTimeMillis - inputTimeMillis
 
+        return when {
+            timeDifference < DateUtils.MINUTE_IN_MILLIS -> "just now"
+            timeDifference < DateUtils.HOUR_IN_MILLIS -> {
+                val minutes = (timeDifference / DateUtils.MINUTE_IN_MILLIS).toInt()
+                "${minutes}m"
+            }
+            timeDifference < DateUtils.DAY_IN_MILLIS -> {
+                val hours = (timeDifference / DateUtils.HOUR_IN_MILLIS).toInt()
+                "${hours}h "
+            }
+            timeDifference < 31 * DateUtils.DAY_IN_MILLIS -> {
+                val days = (timeDifference / DateUtils.DAY_IN_MILLIS).toInt()
+                "${days} day "
+            }
+            else -> {
+                val months = (timeDifference / (31 * DateUtils.DAY_IN_MILLIS)).toInt()
+                "${months} month "
+            }
+        }}
 }
 
 

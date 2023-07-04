@@ -20,7 +20,7 @@ import com.uni.uniteaching.data.Resource
 import com.uni.uniteaching.data.di.UserTypes
 import com.uni.uniteaching.databinding.ActivityHomeScreenBinding
 import com.uni.uniteaching.ui.fragments.HomeScreenFragment
-import com.uni.uniteaching.ui.fragments.NotificationFragment
+import com.uni.uniteaching.ui.fragments.NotificationsFragment
 import com.uni.uniteaching.ui.fragments.ProfileFragment
 import com.uni.uniteaching.ui.fragments.ScheduleFragment
 import com.uni.uniteaching.ui.signUp.SignUp
@@ -39,14 +39,15 @@ class HomeScreen : AppCompatActivity() {
     public lateinit var sectionList: MutableList<SectionData>
 
     lateinit var currentUser: UserTeaching
-    public  var addPost=false
+    public var addPost = false
     private lateinit var binding: ActivityHomeScreenBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        sectionList= arrayListOf()
-        currentUser= UserTeaching()
+        sectionList = arrayListOf()
+        currentUser = UserTeaching()
+
         binding.bottomNavigationView.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.home -> {
@@ -55,7 +56,7 @@ class HomeScreen : AppCompatActivity() {
                 }
 
                 R.id.notification -> {
-                    replaceFragment(NotificationFragment())
+                    replaceFragment(NotificationsFragment())
                     binding.profileData.visibility = View.VISIBLE
                 }
 
@@ -77,7 +78,8 @@ class HomeScreen : AppCompatActivity() {
             true
         }
     }
-    fun getSectionData(){
+
+    fun getSectionData() {
         fireViewModel.getSectionData(currentUser.code)
         lifecycleScope.launchWhenCreated {
             fireViewModel.getSectionData.collectLatest { uri ->
@@ -89,9 +91,10 @@ class HomeScreen : AppCompatActivity() {
                         sectionList.clear()
                         uri.result.forEach {
                             sectionList.add(it)
-                            Log.e("sections",it.sectionName)
+                            Log.e("sections", it.sectionName)
                         }
                     }
+
                     is Resource.Failure -> {
                         Toast.makeText(this@HomeScreen, uri.exception.toString(), Toast.LENGTH_LONG)
                             .show()
@@ -105,6 +108,7 @@ class HomeScreen : AppCompatActivity() {
 
         }
     }
+
     fun replaceFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction().replace(R.id.fragment_container, fragment)
             .addToBackStack(null)
@@ -143,6 +147,7 @@ class HomeScreen : AppCompatActivity() {
 
         }
     }
+
     private fun observeUser() {
         lifecycleScope.launchWhenCreated {
             viewModel.userStudent.collectLatest { state ->
@@ -189,19 +194,20 @@ class HomeScreen : AppCompatActivity() {
                 if (checkForInternet(this)) {
                     storageViewModel.getUri(user.userId)
                 }
-                if (user.userType== UserTypes.assistantUser){
+                if (user.userType == UserTypes.assistantUser) {
                     getSectionData()
                 }
                 observeUser()
                 observeImage()
             } else {
-                Toast.makeText(this, "no user found. have to register", Toast.LENGTH_SHORT).show()
+
                 startActivity(Intent(this, SignUp::class.java))
             }
         }
     }
 
     private fun settingsOnStartApp() {
+        binding.bottomNavigationView.visibility = View.VISIBLE
         binding.bottomNavigationView.itemIconTintList = null
         binding.bottomNavigationView.selectedItemId = R.id.home
 
@@ -212,6 +218,7 @@ class HomeScreen : AppCompatActivity() {
                     replaceFragment(HomeScreenFragment())
                     binding.profileData.visibility = View.VISIBLE
                 }
+
                 R.id.profile -> {
                     replaceFragment(ProfileFragment())
                     binding.profileData.visibility = View.GONE
@@ -224,7 +231,7 @@ class HomeScreen : AppCompatActivity() {
                 }
 
                 R.id.notification -> {
-                    replaceFragment(NotificationFragment())
+                    replaceFragment(NotificationsFragment())
                     binding.profileData.visibility = View.VISIBLE
                 }
 
