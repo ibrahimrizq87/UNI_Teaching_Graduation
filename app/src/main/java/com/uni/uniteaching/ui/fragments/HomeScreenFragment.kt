@@ -19,6 +19,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import com.uni.uniteaching.R
 import com.uni.uniteaching.adapters.PostsAdapter
 import com.uni.uniteaching.classes.Courses
@@ -82,11 +84,11 @@ class HomeScreenFragment : Fragment() {
     private lateinit var addScheduleBtnTxt: TextView
     private lateinit var addCourseBtnTxt: TextView
     private lateinit var postsList: MutableList<PostData>
-
+    lateinit var mStorageRef: StorageReference
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-
+        mStorageRef = FirebaseStorage.getInstance().reference
 
 // update user data --------------------------------------------------------------------------------
         currentUser = UserTeaching()
@@ -145,12 +147,21 @@ class HomeScreenFragment : Fragment() {
         adapter = PostsAdapter(requireContext(), postsList,
 
             onItemClicked = { _, item ->
+<<<<<<< HEAD
                 Log.e("item", item.audience)
                 Log.e("item", item.postID)
                 Log.e("item", item.description)
                 Log.e("item", item.myPost.toString())
                 Log.e("item", item.postUri.toString())
                 Log.e("item", item.type.toString())
+=======
+             /*   Log.e("item",item.audience)
+                Log.e("item",item.postID)
+                Log.e("item",item.description)
+                Log.e("item",item.myPost.toString())
+                Log.e("item",item.postUri.toString())
+                Log.e("item",item.type.toString())*/
+>>>>>>> fdb45154eae5731845f953c85250110199b9af20
 
                 Toast.makeText(requireContext(), item.authorName, Toast.LENGTH_SHORT).show()
             }, onComment = { _, item ->
@@ -351,9 +362,17 @@ class HomeScreenFragment : Fragment() {
                                 post.myPost = true
                             }
 
+<<<<<<< HEAD
                             if (it.type == PostsAdapter.WITH_IMAGE) {
                                 storageViewModel.getPostUri(it.postID)
                                 observeImage(post)
+=======
+                            if(it.type == PostsAdapter.WITH_IMAGE){
+                                // storageViewModel.getPostUri(it.postID)
+                                downloadImage(it.postID,post)
+
+                                //observeImage(post)
+>>>>>>> fdb45154eae5731845f953c85250110199b9af20
 
                             } else {
                                 postsList.add(post)
@@ -438,9 +457,17 @@ class HomeScreenFragment : Fragment() {
                             if (it.authorId == currentUser.userId) {
                                 post.myPost = true
                             }
+<<<<<<< HEAD
                             if (it.type == PostsAdapter.WITH_IMAGE) {
                                 storageViewModel.getPostUri(it.postID)
                                 observeImage(post)
+=======
+                            if(it.type == PostsAdapter.WITH_IMAGE){
+                                // storageViewModel.getPostUri(it.postID)
+                                downloadImage(it.postID,post)
+
+                                //observeImage(post)
+>>>>>>> fdb45154eae5731845f953c85250110199b9af20
 
                             } else {
                                 postsList.add(post)
@@ -461,8 +488,16 @@ class HomeScreenFragment : Fragment() {
         }
     }
 
+<<<<<<< HEAD
     private fun updatePost() {
         postsList.clear()
+=======
+    val sectionList= (activity as HomeScreen).sectionList
+    sectionList.forEach {
+
+    }
+    viewModel.getPostsGeneral()
+>>>>>>> fdb45154eae5731845f953c85250110199b9af20
 
         val sectionList = (activity as HomeScreen).sectionList
         sectionList.forEach {
@@ -491,7 +526,6 @@ class HomeScreenFragment : Fragment() {
 
                     is Resource.Success -> {
                         state.result.forEach {
-                            Log.e("home section post", it.postID)
                             var post = PostData(
                                 it.description,
                                 it.authorName,
@@ -507,8 +541,10 @@ class HomeScreenFragment : Fragment() {
                                 post.myPost = true
                             }
                             if (it.type == PostsAdapter.WITH_IMAGE) {
-                                storageViewModel.getPostUri(it.postID)
-                                observeImage(post)
+                                // storageViewModel.getPostUri(it.postID)
+                                downloadImage(it.postID,post)
+
+                                //observeImage(post)
 
                             } else {
                                 postsList.add(post)
@@ -527,6 +563,20 @@ class HomeScreenFragment : Fragment() {
                     else -> {}
                 }
             }
+        }
+    }
+    fun downloadImage(id:String,post: PostData){
+        val downloadUriTask=mStorageRef.child("posts/$id.png").downloadUrl
+        downloadUriTask.addOnSuccessListener {
+            post.postUri=it
+            if(postsList.indexOf(post)==-1){
+                postsList.add(post)
+            }
+
+            adapter.update(postsList)
+        }.addOnFailureListener {
+            Toast.makeText(context, it.toString(), Toast.LENGTH_LONG)
+                .show()
         }
     }
 }

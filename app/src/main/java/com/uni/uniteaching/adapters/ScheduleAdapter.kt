@@ -1,6 +1,7 @@
 package com.uni.uniteaching.adapters
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -54,10 +55,10 @@ class ScheduleAdapter(
             holder.location_l.text = currentItem.hallID
             holder.lecturer.text = currentItem.professorName
             holder.day.text = currentItem.day
-
             holder.from_l.text = currentItem.time
             holder.to_l.text = currentItem.endTime
-            if (currentItem.isRunning) {
+
+            if (currentItem.hasRunning) {
                 holder.isRunning.text = "is running"
             } else {
                 holder.isRunning.text = "not running"
@@ -72,7 +73,7 @@ class ScheduleAdapter(
             holder.day.text = currentItem.day
             holder.from.text = currentItem.time
             holder.to.text = currentItem.endTime
-            if (currentItem.isRunning) {
+            if (currentItem.hasRunning) {
                 holder.isRunning.text = "is running"
             } else {
                 holder.isRunning.text = "not running"

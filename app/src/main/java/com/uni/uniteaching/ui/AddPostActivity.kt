@@ -278,6 +278,7 @@ class AddPostActivity : AppCompatActivity() {
             viewModel.getCoursesByProfessorID(currentUser.code)
         }
 
+<<<<<<< HEAD
         observeCourses()
 
     }
@@ -287,6 +288,24 @@ class AddPostActivity : AppCompatActivity() {
             viewModel.searchStudentByID.collectLatest {
                 when (it) {
                     is Resource.Loading -> {
+=======
+        private fun observeStudents() {
+            lifecycleScope.launchWhenCreated {
+                viewModel.searchStudentByID.collectLatest {
+                    when (it) {
+                        is Resource.Loading -> {
+                        }
+                        is Resource.Success -> {
+                            studentsList.clear()
+                            val student=it.result
+                            if(student.name.isNotEmpty()){studentsList.add(student)
+                                recyAdapter.update(studentsList)}
+                            }
+                        is Resource.Failure -> {
+                            Toast.makeText(this@AddPostActivity,it.exception, Toast.LENGTH_SHORT).show()
+                        }
+                        else->{}
+>>>>>>> fdb45154eae5731845f953c85250110199b9af20
                     }
 
                     is Resource.Success -> {

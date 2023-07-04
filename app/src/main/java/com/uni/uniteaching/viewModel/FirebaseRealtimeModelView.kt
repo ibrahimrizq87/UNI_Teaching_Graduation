@@ -2,6 +2,7 @@ package com.uni.uniteaching.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.uni.uniteaching.classes.Hall
 import com.uni.uniteaching.data.FirebaseRealtimeRepo
 import com.uni.uniteaching.data.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,15 +17,13 @@ class FirebaseRealtimeModelView @Inject constructor(
 ): ViewModel() {
 
 
+    private val _startGeneratingCode= MutableStateFlow<Resource<String>?>(null)
+    val startGeneratingCode=_startGeneratingCode.asStateFlow()
 
-
-    private val _getAttendanceCode= MutableStateFlow<Resource<Boolean>?>(null)
-    val getAttendanceCode=_getAttendanceCode.asStateFlow()
-
-    fun getAttendanceCode (embeddedId:String,scannedCode:Int)= viewModelScope.launch {
-        _getAttendanceCode.value= Resource.Loading
-        repository.getAttendWithCode(embeddedId,scannedCode){
-            _getAttendanceCode.value=it
+    fun startGeneratingCode (hall:Hall)= viewModelScope.launch {
+        _startGeneratingCode.value= Resource.Loading
+        repository.startGeneratingCode(hall){
+            _startGeneratingCode.value=it
         }
     }
 }

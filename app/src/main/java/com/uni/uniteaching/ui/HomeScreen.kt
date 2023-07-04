@@ -91,7 +91,9 @@ class HomeScreen : AppCompatActivity() {
                         sectionList.clear()
                         uri.result.forEach {
                             sectionList.add(it)
+
                             Log.e("sections", it.sectionName)
+
                         }
                     }
 
